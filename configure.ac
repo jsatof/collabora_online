@@ -1080,8 +1080,22 @@ else
     AC_DEFINE([HAVE_STD_FILESYSTEM_EXPERIMENTAL],0,[Whether the std::filesystem is in the experimental header.])
 fi
 
+# Inkscape mods done here, add include dirs, and system deps
+# The hardcoded paths should be removed (obviously)
+# wont build on any one else's system
 AS_IF([test -n "$LOKIT_PATH"],
-      [CPPFLAGS="$CPPFLAGS -I${LOKIT_PATH}"])
+      [CPPFLAGS="$CPPFLAGS -I${LOKIT_PATH} -I/usr/include/sigc++-2.0 -I/usr/lib/sigc++-2.0/include -I/usr/include/glibmm-2.4 -I/usr/lib/glibmm-2.4/include  -I/home/james/develop/collabora/include/inkscape -I/home/james/develop/collabora/include/inkscape/3rdparty/2geom/include -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/giomm-2.4 -I/usr/lib/giomm-2.4/include"])
+
+LD_FLAGS="$LD_FLAGS -L/usr/lib/inkscape"
+
+# idk autotools enough to figure out why these macros dont lead to proper header inclusion
+# these are required sys deps for inkscape
+PKG_CHECK_MODULES([GTKMM],  [gtkmm-3.0 >= 3.24.0])
+PKG_CHECK_MODULES([SIGCXX], [sigc++-2.0 >= 2.12.0])
+PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4 >= 2.4.0])
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.0.0])
+PKG_CHECK_MODULES([GIOMM], [giomm-2.4 >= 2.4.0])
+
 lokit_msg="$LOKIT_PATH"
 
 AS_IF([test "$ENABLE_IOSAPP" != "true" -a "$ENABLE_ANDROIDAPP" != "true"],

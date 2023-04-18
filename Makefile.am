@@ -74,6 +74,9 @@ if ENABLE_SSL
 include_paths += ${OPENSSL_CFLAGS}
 endif
 
+# appending Inkscape system dependencies
+include_paths += ${GTKMM_CFLAGS}
+
 AM_CPPFLAGS = -pthread -DCOOLWSD_DATADIR='"@COOLWSD_DATADIR@"' \
 	      -DCOOLWSD_CONFIGDIR='"@COOLWSD_CONFIGDIR@"' \
 	      -DDEBUG_ABSSRCDIR='"@abs_srcdir@"' \
@@ -84,6 +87,13 @@ AM_CPPFLAGS += -DNDEBUG
 endif
 
 AM_LDFLAGS = -pthread -Wl,-E -lpam $(ZLIB_LIBS) $(ZSTD_LIBS) ${PNG_LIBS}
+
+# inkscape sys deps
+INKSCAPE_CFLAGS = -I/usr/include/inkscape
+INKSCAPE_LIBS = -L/usr/lib/inkscape -linkscape_base -l2geom
+
+AM_CPPFLAGS += ${GTKMM_CFLAGS} ${GLIBMM_CFLAGS} ${SIGCXX_CFLAGS} ${GLIB_CFLAGS} ${INKSCAPE_CFLAGS}
+AM_LDFLAGS += ${GTKMM_LIBS} ${GLIBMM_LIBS} ${SIGCXX_LIBS} ${GLIB_LIBS} ${INKSCAPE_LIBS}
 
 if ENABLE_SSL
 AM_LDFLAGS += ${OPENSSL_LIBS}
