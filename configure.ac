@@ -1081,11 +1081,11 @@ else
 fi
 
 # Inkscape mods done here, add include dirs, and system deps
-# The hardcoded paths should be removed (obviously)
-# wont build on any one else's system
+# The hardcoded paths should be removed (obviously) - wont build on any one else's system
 AS_IF([test -n "$LOKIT_PATH"],
-      [CPPFLAGS="$CPPFLAGS -I${LOKIT_PATH} -I/usr/include/sigc++-2.0 -I/usr/lib/sigc++-2.0/include -I/usr/include/glibmm-2.4 -I/usr/lib/glibmm-2.4/include  -I/home/james/develop/collabora/include/inkscape -I/home/james/develop/collabora/include/inkscape/3rdparty/2geom/include -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/giomm-2.4 -I/usr/lib/giomm-2.4/include"])
+      [CPPFLAGS="$CPPFLAGS -I${LOKIT_PATH} -I/usr/include/sigc++-2.0 -I/usr/lib/sigc++-2.0/include -I/usr/include/glibmm-2.4 -I/usr/lib/glibmm-2.4/include  -I/home/james/develop/collabora/inkscape_include -I/home/james/develop/collabora/inkscape_include/3rdparty/2geom/include  -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/giomm-2.4 -I/usr/lib/giomm-2.4/include -I/usr/include/cairo"])
 
+# inkscape on system has libraries in /usr/lib and /usr/lib/inkscape
 LD_FLAGS="$LD_FLAGS -L/usr/lib/inkscape"
 
 # idk autotools enough to figure out why these macros dont lead to proper header inclusion
