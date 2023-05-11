@@ -89,8 +89,8 @@ endif
 AM_LDFLAGS = -pthread -Wl,-E -lpam $(ZLIB_LIBS) $(ZSTD_LIBS) ${PNG_LIBS}
 
 # inkscape sys deps
-INKSCAPE_CFLAGS = -I/usr/include/inkscape
-INKSCAPE_LIBS = -L/usr/lib/inkscape -linkscape_base -l2geom
+INKSCAPE_CFLAGS = -I@LOK_PATH@/inkscape
+INKSCAPE_LIBS = -L@LO_PATH@/inkscape -linkscape_base -l2geom
 
 AM_CPPFLAGS += ${GTKMM_CFLAGS} ${GLIBMM_CFLAGS} ${SIGCXX_CFLAGS} ${GLIB_CFLAGS} ${INKSCAPE_CFLAGS}
 AM_LDFLAGS += ${GTKMM_LIBS} ${GLIBMM_LIBS} ${SIGCXX_LIBS} ${GLIB_LIBS}

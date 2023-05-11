@@ -9,6 +9,8 @@
  * a document editing session.
  */
 
+#include <document.h>
+
 #include <config.h>
 #include <config_version.h>
 
