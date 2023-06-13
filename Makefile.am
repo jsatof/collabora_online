@@ -74,9 +74,6 @@ if ENABLE_SSL
 include_paths += ${OPENSSL_CFLAGS}
 endif
 
-# appending Inkscape system dependencies
-include_paths += ${GTKMM_CFLAGS}
-
 AM_CPPFLAGS = -pthread -DCOOLWSD_DATADIR='"@COOLWSD_DATADIR@"' \
 	      -DCOOLWSD_CONFIGDIR='"@COOLWSD_CONFIGDIR@"' \
 	      -DDEBUG_ABSSRCDIR='"@abs_srcdir@"' \
@@ -88,15 +85,11 @@ endif
 
 AM_LDFLAGS = -pthread -Wl,-E -lpam $(ZLIB_LIBS) $(ZSTD_LIBS) ${PNG_LIBS}
 
-# inkscape sys deps
-INKSCAPE_CFLAGS = -I@LOK_PATH@/inkscape
-INKSCAPE_LIBS = -L@LO_PATH@/inkscape -linkscape_base -l2geom
+# appending Inkscape system dependencies
+ink_include_paths = -I@LO_PATH@/src -I@LO_PATH@/src/3rdparty/2geom/include
 
-AM_CPPFLAGS += ${GTKMM_CFLAGS} ${GLIBMM_CFLAGS} ${SIGCXX_CFLAGS} ${GLIB_CFLAGS} ${INKSCAPE_CFLAGS}
-AM_LDFLAGS += ${GTKMM_LIBS} ${GLIBMM_LIBS} ${SIGCXX_LIBS} ${GLIB_LIBS}
-
-coolforkit_CFLAGS = ${INKSCAPE_CFLAGS}
-coolforkit_LDADD = ${INKSCAPE_LIBS}
+AM_CPPFLAGS += ${GTKMM_CFLAGS} ${GLIBMM_CFLAGS} ${SIGCXX_CFLAGS} ${GLIB_CFLAGS} ${ink_include_paths}
+AM_LDFLAGS += ${GTKMM_LIBS} ${GLIBMM_LIBS} ${SIGCXX_LIBS} ${GLIB_LIBS} -L@LO_PATH@/build/lib -linkscape_base -l2geom -lpoppler 
 
 if ENABLE_SSL
 AM_LDFLAGS += ${OPENSSL_LIBS}

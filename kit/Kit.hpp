@@ -15,6 +15,7 @@
 
 #define LOK_USE_UNSTABLE_API
 #include <LibreOfficeKit/LibreOfficeKit.hxx>
+#include <InkscapeKit/InkscapeKit.h>
 
 #if MOBILEAPP
 

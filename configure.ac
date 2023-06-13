@@ -1080,15 +1080,15 @@ else
     AC_DEFINE([HAVE_STD_FILESYSTEM_EXPERIMENTAL],0,[Whether the std::filesystem is in the experimental header.])
 fi
 
+INKSCAPE_PROJECT_PATH="$HOME/develop/inkscape"
+INKSCAPE_CFLAGS="-I/usr/include/sigc++-2.0 -I/usr/lib/sigc++-2.0/include -I/usr/include/glibmm-2.4 -I/usr/lib/glibmm-2.4/include  -I${INKSCAPE_PROJECT_PATH}/src -I${INKSCAPE_PROJECT_PATH}/src/3rdparty/2geom/include  -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/giomm-2.4 -I/usr/lib/giomm-2.4/include -I/usr/include/cairo"
 # Appended CPPFLAGS with inkscape sys deps include paths
-AS_IF([test -n "$LOKIT_PATH"],
-      [CPPFLAGS="$CPPFLAGS -I${LOKIT_PATH} -I/usr/include/sigc++-2.0 -I/usr/lib/sigc++-2.0/include -I/usr/include/glibmm-2.4 -I/usr/lib/glibmm-2.4/include  -I${LOKIT_PATH}/inkscape -I${LOKIT_PATH}/inkscape/3rdparty/2geom/include  -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/giomm-2.4 -I/usr/lib/giomm-2.4/include -I/usr/include/cairo"])
+CPPFLAGS="$CPPFLAGS ${INKSCAPE_CFLAGS}"
+# so cppunit can find inkscape headers
+CPPUNIT_CFLAGS="$CPPUNIT_CFLAGS -I${INKSCAPE_CFLAGS}"
 
-AC_SEARCH_LIBS([gtkmm-3.0])
-AC_SEARCH_LIBS([sigc++-2.0])
-AC_SEARCH_LIBS([glibmm-2.0])
-AC_SEARCH_LIBS([glib-2.0])
-AC_SEARCH_LIBS([giomm-2.4])
+AS_IF([test -n "$LOKIT_PATH"],
+      [CPPFLAGS="$CPPFLAGS -I${LOKIT_PATH}"])
 
 lokit_msg="$LOKIT_PATH"
 
@@ -1106,7 +1106,7 @@ AS_IF([test "$ENABLE_IOSAPP" != "true" -a "$ENABLE_ANDROIDAPP" != "true"],
       ])
 
 # Add directory for inkscape link paths
-LD_FLAGS="$LD_FLAGS -L${LO_PATH}/inkscape"
+LD_FLAGS="$LD_FLAGS -L${INKSCAPE_PROJECT_PATH}/build/lib -lpoppler"
 
 JAIL_PATH=not-set
 SYSTEMPLATE_PATH=not-set

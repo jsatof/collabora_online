@@ -18,7 +18,8 @@ AM_CXXFLAGS = $(CPPUNIT_CFLAGS) -DTDOC=\"$(abs_top_srcdir)/test/data\" \
 	-pthread -DCOOLWSD_DATADIR='"@COOLWSD_DATADIR@"' \
 	-DCOOLWSD_CONFIGDIR='"@COOLWSD_CONFIGDIR@"' \
 	-DDEBUG_ABSSRCDIR='"@abs_srcdir@"' \
-	${include_paths}
+	${include_paths} \
+	${ink_include_paths}
 
 # These are ordered by how long each takes to run.
 # The longest-running tests are put first, the

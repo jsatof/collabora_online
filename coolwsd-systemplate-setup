@@ -102,6 +102,9 @@ do
     ln -f ../tmp/dev/$file $CHROOT/dev/ 2> /dev/null || ln -f -s ../tmp/dev/$file $CHROOT/dev/ || echo "$0: Failed to link dev/$file"
 done
 
+# Inkscape: Place an svg file stored in $INSTDIR in $CHROOT/tmp
+cp $INSTDIR/test.svg $CHROOT/tmp
+
 # Create a relative symbolic link within systemplate that points from
 # the path of $INSTDIR (as seen from the jail as an absolute path)
 # to the /lo path, where the instdir of LO will really reside.

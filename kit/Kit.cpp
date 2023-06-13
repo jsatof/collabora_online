@@ -8,9 +8,6 @@
  * The main entry point for the LibreOfficeKit process serving
  * a document editing session.
  */
-
-#include <document.h>
-
 #include <config.h>
 #include <config_version.h>
 
