@@ -48,6 +48,7 @@
 
 #define LOK_USE_UNSTABLE_API
 #include <LibreOfficeKit/LibreOfficeKitInit.h>
+#include <InkscapeKit/InkscapeKit.h>
 
 #include <Poco/File.h>
 #include <Poco/Exception.h>
@@ -93,6 +94,7 @@
 #endif
 
 #define LIB_SOFFICEAPP  "lib" "sofficeapp" ".so"
+#define LIB_INKSCAPEAPP "lib" "inkscape_base" ".so"
 #define LIB_MERGED      "lib" "mergedlo" ".so"
 
 using Poco::Exception;
@@ -116,6 +118,7 @@ static Document *singletonDocument = nullptr;
 #endif
 
 _LibreOfficeKit* loKitPtr = nullptr;
+InkKit::InkscapeKit *inkKitPtr = nullptr;
 
 /// Used for test code to accelerating waiting until idle and to
 /// flush sockets with a 'processtoidle' -> 'idle' reply.
@@ -656,6 +659,7 @@ public:
 
 public:
     Document(const std::shared_ptr<lok::Office>& loKit,
+             const std::shared_ptr<InkKit::InkscapeKit>& inkKit,
              const std::string& jailId,
              const std::string& docKey,
              const std::string& docId,
@@ -664,6 +668,7 @@ public:
              const std::shared_ptr<WebSocketHandler>& websocketHandler,
              unsigned mobileAppDocId)
       : _loKit(loKit),
+        _inkKit(inkKit),
         _jailId(jailId),
         _docKey(docKey),
         _docId(docId),
@@ -1943,6 +1948,7 @@ public:
 
 private:
     std::shared_ptr<lok::Office> _loKit;
+    std::shared_ptr<InkKit::InkscapeKit> _inkKit;
     const std::string _jailId;
     /// URL-based key. May be repeated during the lifetime of WSD.
     const std::string _docKey;
@@ -2288,6 +2294,7 @@ class KitWebSocketHandler final : public WebSocketHandler
     std::shared_ptr<TileQueue> _queue;
     std::string _socketName;
     std::shared_ptr<lok::Office> _loKit;
+    std::shared_ptr<InkKit::InkscapeKit> _inkKit;
     std::string _jailId;
     std::string _docKey; //< When we get it while creating a new view.
     std::shared_ptr<Document> _document;
@@ -2295,11 +2302,12 @@ class KitWebSocketHandler final : public WebSocketHandler
     const unsigned _mobileAppDocId;
 
 public:
-    KitWebSocketHandler(const std::string& socketName, const std::shared_ptr<lok::Office>& loKit, const std::string& jailId, std::shared_ptr<KitSocketPoll> ksPoll, unsigned mobileAppDocId) :
+    KitWebSocketHandler(const std::string& socketName, const std::shared_ptr<lok::Office>& loKit, const std::shared_ptr<InkKit::InkscapeKit> inkKit, const std::string& jailId, std::shared_ptr<KitSocketPoll> ksPoll, unsigned mobileAppDocId) :
         WebSocketHandler(/* isClient = */ true, /* isMasking */ false),
         _queue(std::make_shared<TileQueue>()),
         _socketName(socketName),
         _loKit(loKit),
+        _inkKit(inkKit),
         _jailId(jailId),
         _ksPoll(std::move(ksPoll)),
         _mobileAppDocId(mobileAppDocId)
@@ -2366,7 +2374,7 @@ protected:
             if (!_document)
             {
                 _document = std::make_shared<Document>(
-                    _loKit, _jailId, _docKey, docId, url, _queue,
+                    _loKit, _inkKit, _jailId, _docKey, docId, url, _queue,
                     std::static_pointer_cast<WebSocketHandler>(shared_from_this()),
                     _mobileAppDocId);
                 _ksPoll->setDocument(_document);
@@ -2949,8 +2957,12 @@ void lokit_main(
         auto mainKit = KitSocketPoll::create();
         mainKit->runOnClientThread(); // We will do the polling on this thread.
 
+        // inkscape
+        auto inkKit = std::make_shared<InkKit::InkscapeKit>();
+        auto test_access = inkKit->getDocument("url");
+
         std::shared_ptr<KitWebSocketHandler> websocketHandler =
-            std::make_shared<KitWebSocketHandler>("child_ws", loKit, jailId, mainKit, numericIdentifier);
+            std::make_shared<KitWebSocketHandler>("child_ws", loKit, inkKit, jailId, mainKit, numericIdentifier);
 
 #if !MOBILEAPP
         if (!mainKit->insertNewUnixSocket(MasterLocation, pathAndQuery, websocketHandler,
@@ -3102,6 +3114,7 @@ bool globalPreinit(const std::string &loTemplate)
         }
     }
 
+
     LokHookPreInit2* preInit = reinterpret_cast<LokHookPreInit2 *>(dlsym(handle, "lok_preinit_2"));
     if (!preInit)
     {
@@ -3114,6 +3127,21 @@ bool globalPreinit(const std::string &loTemplate)
     {
         LOG_FTL("No libreofficekit_hook_2 symbol in " << loadedLibrary << ": " << dlerror());
     }
+
+    // inkscape lib init
+    void *inklib_handle;
+    const std::string inklib_path = loTemplate + "/lib/" LIB_INKSCAPEAPP;
+    if (File(inklib_path).exists())
+    {
+        inklib_handle = dlopen(inklib_path.c_str(), RTLD_GLOBAL|RTLD_NOW);
+    }
+
+    auto inkHookFunction = reinterpret_cast<InkKit::HookFunction *>(dlsym(inklib_handle, "ink_init"));
+    if (!inkHookFunction)
+    {
+        LOG_FTL("No ink_init symbol in libinkscape_base.so: " << dlerror());
+    }
+
 
     // Disable problematic components that may be present from a
     // desktop or developer's install if env. var not set.

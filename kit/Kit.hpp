@@ -152,5 +152,6 @@ std::shared_ptr<lok::Document> getLOKDocumentForAndroidOnly();
 #endif
 
 extern _LibreOfficeKit* loKitPtr;
+extern InkKit::InkscapeKit* inkKitPtr;
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

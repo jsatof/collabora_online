@@ -86,10 +86,11 @@ endif
 AM_LDFLAGS = -pthread -Wl,-E -lpam $(ZLIB_LIBS) $(ZSTD_LIBS) ${PNG_LIBS}
 
 # appending Inkscape system dependencies
-ink_include_paths = -I@LO_PATH@/src -I@LO_PATH@/src/3rdparty/2geom/include
+ink_CFLAGS = ${GTKMM_CFLAGS} ${GLIBMM_CFLAGS} ${SIGCXX_CFLAGS} ${GLIB_CFLAGS} ${ink_include_paths} -I@LO_PATH@/src -I@LO_PATH@/src/3rdparty/2geom/include
+ink_LDFLAGS = ${GTKMM_LIBS} ${GLIBMM_LIBS} ${SIGCXX_LIBS} ${GLIB_LIBS} -L@LO_PATH@/build/lib -linkscape_base -l2geom -lpoppler  
 
-AM_CPPFLAGS += ${GTKMM_CFLAGS} ${GLIBMM_CFLAGS} ${SIGCXX_CFLAGS} ${GLIB_CFLAGS} ${ink_include_paths}
-AM_LDFLAGS += ${GTKMM_LIBS} ${GLIBMM_LIBS} ${SIGCXX_LIBS} ${GLIB_LIBS} -L@LO_PATH@/build/lib -linkscape_base -l2geom -lpoppler 
+AM_CPPFLAGS += ${ink_CFLAGS}
+AM_LDFLAGS += ${ink_LDFLAGS}
 
 if ENABLE_SSL
 AM_LDFLAGS += ${OPENSSL_LIBS}
